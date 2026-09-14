@@ -56,26 +56,69 @@ Googlyness is the behavioral round. It is not a technical screen and not a pure 
 
 **Your story:** On-premise to cloud modernization - High-stakes conflict between a Platform Engineering Lead and a Finance/FinOps Lead.
 
-**Situation**
-During a major modernization migrating our core infrastructure from an on-premise datacenter to AWS, we hit a severe organizational deadlock six months post-landing. Our FinOps and Finance Lead flagged that our monthly AWS spend was $180,000 over budget—a 40% cost overrun driven by double-paying for on-premise hardware while running over-provisioned cloud instances. He demanded an immediate feature freeze, mandating that Engineering spend the next two quarters right-sizing environments and rewriting legacy services to serverless. Simultaneously, my Platform Engineering Lead adamantly refused, arguing that reducing instance sizes threatened our 99.99% uptime SLA and that freezing architectural upgrades would destroy their roadmap velocity. The conflict reached a complete standstill, with Finance threatening to freeze engineering requisitions and Engineering refusing to attend cost reviews.
+The number set
+	
+Planned monthly infra spend	$450K
+Actual	$630K → $180K variance (40%)
+Traffic growth over same period	80% (50M → 90M transactions/mo)
+Cost per transaction	$0.0090 → $0.0070 (down 22%)
+Growth-driven, re-baselined	$108K (60%)
+Genuine waste	$72K
+— non-prod running 24/7 at full size	$45K
+— over-provisioned prod + orphaned resources	$27K
+Recovered: non-prod scheduling	$29K
+Recovered: prod right-sizing	$23K
+Total recovered	$52K/mo
+Left on the table	$20K
+p99 latency baseline	40ms
+Circuit breaker	pause at +10% off p99 baseline
 
-**Task**
-As the Senior TPM, I had to step in, de-escalate the friction between the two leads, deconstruct the root cause of the budget variance, and establish an optimization strategy that satisfied financial governance without degrading platform reliability or feature velocity.
+The arithmetic that makes it hold: $108K re-baselined + $52K recovered + $20K accepted = $180K. Nothing floats.
 
-**Action**
-I led a systematic, three-step conflict resolution process:
+Script — about 110 seconds
 
-**Depersonalized the Debate with Unit-Economics Data**: I brought both leads into a dedicated working session to shift the focus from broad allegations to granular data. I conducted a telemetry audit that separated real business growth from actual waste. I showed Finance that 60% of the cost increase was directly tied to an 80% spike in user traffic—meaning cost-per-transaction actually fell—while proving to Engineering that $45,000 per month was being wasted on non-production staging environments running 24/7 at peak capacity.
+About six months after our first workloads landed in AWS, our FinOps lead escalated hard: infrastructure spend was running $180K a month over plan, roughly 40% over. His read was that we'd over-provisioned in the cloud while still paying for the datacenter, and he wanted a two-quarter feature freeze so engineering could right-size everything and rewrite services to serverless. My platform lead refused outright. His position was that shrinking instances put our availability commitment at risk and he'd be the one carrying the pager for it. By the time I got involved, Finance was threatening to freeze requisitions and engineering had stopped attending cost reviews.
 
-**Engineered a Phased, Non-Disruptive Optimization Plan:** To resolve the deadlock, I created a phased compromise. For Phase 1, I worked with Platform to implement automated shutdown scripts for dev/staging environments outside business hours and committed baseline workloads to 1-year AWS Savings Plans. This recovered $35,000 a month immediately without altering a single line of production code.
+What struck me was that nobody had separated growth from waste. Both leads were arguing about one number that had at least two things inside it. So I worked with one of the platform engineers to pull cost telemetry against transaction volume, and the picture changed. Transaction volume was up 80% over the same period. Cost was up 40%. Cost per transaction had actually dropped about 22%, from nine-tenths of a cent to seven-tenths. So roughly $108K of that variance wasn't overrun, it was a budget nobody had re-baselined after the business grew.
 
-**Established Shared Governance & Circuit Breakers:** To address Finance's long-term concerns while protecting Engineering's SLAs, I integrated real-time cost-per-request telemetry directly into the engineering team's performance dashboards. We agreed on an explicit circuit breaker: right-sizing would occur incrementally in staging first, and if latency degraded by more than 5 milliseconds, the automated scaling down would pause instantly.
+That left $72K of real waste, and $45K of it was non-production environments running at full production size, twenty-four hours a day.
 
-**Result**
-By replacing finger-pointing with unit economics and automated guardrails, I re-established a productive partnership between both leads. We reduced monthly cloud spend by $52,000, eliminating the budget variance, while keeping latency sub-10 milliseconds and maintaining 100% of our planned feature release dates. Furthermore, this joint unit-economics framework was adopted across the entire enterprise as the standard operating model for cloud governance.
+Which meant I could split the problem. Phase one was the part neither lead had to concede anything on: scheduled shutdown on dev and staging outside working hours, and a one-year Savings Plan sized to the baseline we were confident would survive right-sizing, not to current usage. No production change, no code change, about three weeks to land, $29K a month back.
 
-Concrete Metrics: Highlights specific financial ($52k savings, 40% overrun) and technical (sub-10ms latency, 99.99% SLA) metrics that demonstrate Senior TPM rigor.
+Phase two was production right-sizing, and there I needed the platform lead's terms rather than mine. Staging first, incremental steps, and an automated pause if p99 latency moved more than 10% off a 40 millisecond baseline. He picked the threshold, not me. That's what got him back in the room.
 
+We recovered $52K a month of the $72K and re-baselined the other $108K with Finance as growth. We deliberately left about $20K — the UAT environments had to mirror production for a regulatory parallel run and couldn't be scheduled down. And it wasn't free for engineering: the platform team gave up roughly two sprints of roadmap to build the instrumentation. What I'd actually point to is that cost-per-transaction became how both teams talked about spend afterward, so the argument didn't recur the next quarter.
+
+What each fix bought you
+
+Finance's theory is now a belief, not a fact. You disprove it. That's a stronger action than mediating between two valid positions.
+
+The variance reconciles in the open. $108K / $52K / $20K. If the interviewer does the math, it works.
+
+Cost-per-transaction is the reframe. This is the senior move in the story — you moved both leads off a shared number they couldn't agree on and onto a unit metric that changed the answer.
+
+The platform lead sets the threshold. That single line converts "I imposed a compromise" into "I got them to own it."
+
+Two real costs. $20K left uncaptured for a reason you can defend, and two sprints of roadmap the platform team paid. Nothing is free anymore.
+
+Probes, and your answers
+
+"How did $52K eliminate a $180K variance?"
+It didn't. $108K was re-baselined as growth because unit cost had fallen, $52K was recovered, and we accepted $20K we couldn't touch. The budget was wrong, not just the spend.
+
+"You committed to a one-year Savings Plan while planning to right-size. Didn't you lock in capacity you were about to shrink?"
+Compute Savings Plans commit to a dollar-per-hour floor, not instance types, so the commitment flexes across family and size. I sized the commitment to the baseline we were confident would survive right-sizing, not to what we were running. Know this cold or cut the Savings Plan line entirely.
+
+"How did you know the traffic growth was real and not a bug or retries?"
+Have an answer. Business-side volume metric, not an infra counter — orders, trades, claims, whatever the real unit was.
+
+"Why hadn't anyone re-baselined the budget?"
+The plan was built pre-migration against a static datacenter footprint. Nobody had built a mechanism to update it as volume moved. That's the structural gap, and it's what the cost-per-transaction dashboard fixed.
+
+"What did Finance give up?"
+The feature freeze. He wanted two quarters of engineering time and got a phased plan with a slower recovery curve instead.
+
+The two figures I'd most want you to sanity-check before using this: the 80% traffic growth and the $45K non-prod number. Those are the ones carrying the whole reframe, and they're the ones an interviewer is most likely to pull on.
 ### Q8. Tell me about a time you helped someone when it wasn't your responsibility to do so.
 
 **Probes:** Do you care about the team and the outcome beyond your own scope — the "easy to work with" signal.
