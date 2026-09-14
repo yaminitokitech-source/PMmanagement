@@ -64,6 +64,7 @@ As the Senior TPM, I had to step in, de-escalate the friction between the two le
 
 **Action**
 I led a systematic, three-step conflict resolution process:
+
 **Depersonalized the Debate with Unit-Economics Data**: I brought both leads into a dedicated working session to shift the focus from broad allegations to granular data. I conducted a telemetry audit that separated real business growth from actual waste. I showed Finance that 60% of the cost increase was directly tied to an 80% spike in user traffic—meaning cost-per-transaction actually fell—while proving to Engineering that $45,000 per month was being wasted on non-production staging environments running 24/7 at peak capacity.
 
 **Engineered a Phased, Non-Disruptive Optimization Plan:** To resolve the deadlock, I created a phased compromise. For Phase 1, I worked with Platform to implement automated shutdown scripts for dev/staging environments outside business hours and committed baseline workloads to 1-year AWS Savings Plans. This recovered $35,000 a month immediately without altering a single line of production code.
