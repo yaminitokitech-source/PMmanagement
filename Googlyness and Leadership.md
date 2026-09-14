@@ -54,7 +54,37 @@ Googlyness is the behavioral round. It is not a technical screen and not a pure 
 
 **Your notes:** Link to some data you found to prove your point, present it to your colleague / leadership. Connects to: how do you influence stakeholders and partnerships.
 
-**Your story:**
+**Your story:** ere is a dedicated, 2-minute spoken STAR response focused on an on-premise to cloud modernization where you resolved a high-stakes conflict between a Platform Engineering Lead and a Finance/FinOps Lead.
+
+Spoken Script (Target Time: 2 Minutes)
+Situation
+
+During a major modernization migrating our core infrastructure from an on-premise datacenter to AWS, we hit a severe organizational deadlock six months post-landing. Our FinOps and Finance Lead flagged that our monthly AWS spend was $180,000 over budget—a 40% cost overrun driven by double-paying for on-premise hardware while running over-provisioned cloud instances. He demanded an immediate feature freeze, mandating that Engineering spend the next two quarters right-sizing environments and rewriting legacy services to serverless. Simultaneously, my Platform Engineering Lead adamantly refused, arguing that reducing instance sizes threatened our 99.99% uptime SLA and that freezing architectural upgrades would destroy their roadmap velocity. The conflict reached a complete standstill, with Finance threatening to freeze engineering requisitions and Engineering refusing to attend cost reviews.
+
+Task
+
+As the Senior TPM, I had to step in, de-escalate the friction between the two leads, deconstruct the root cause of the budget variance, and establish an optimization strategy that satisfied financial governance without degrading platform reliability or feature velocity.
+
+Action
+
+I led a systematic, three-step conflict resolution process:
+
+Depersonalized the Debate with Unit-Economics Data: I brought both leads into a dedicated working session to shift the focus from broad allegations to granular data. I conducted a telemetry audit that separated real business growth from actual waste. I showed Finance that 60% of the cost increase was directly tied to an 80% spike in user traffic—meaning cost-per-transaction actually fell—while proving to Engineering that $45,000 per month was being wasted on non-production staging environments running 24/7 at peak capacity.
+
+Engineered a Phased, Non-Disruptive Optimization Plan: To resolve the deadlock, I created a phased compromise. For Phase 1, I worked with Platform to implement automated shutdown scripts for dev/staging environments outside business hours and committed baseline workloads to 1-year AWS Savings Plans. This recovered $35,000 a month immediately without altering a single line of production code.
+
+Established Shared Governance & Circuit Breakers: To address Finance's long-term concerns while protecting Engineering's SLAs, I integrated real-time cost-per-request telemetry directly into the engineering team's performance dashboards. We agreed on an explicit circuit breaker: right-sizing would occur incrementally in staging first, and if latency degraded by more than 5 milliseconds, the automated scaling down would pause instantly.
+
+Result
+
+By replacing finger-pointing with unit economics and automated guardrails, I re-established a productive partnership between both leads. We reduced monthly cloud spend by $52,000, eliminating the budget variance, while keeping latency sub-10 milliseconds and maintaining 100% of our planned feature release dates. Furthermore, this joint unit-economics framework was adopted across the entire enterprise as the standard operating model for cloud governance.
+
+Why This 2-Minute Script Works
+Clear Structural Conflict: Frames both leads as protecting critical business imperatives—Finance protecting operating margins and Platform protecting uptime and velocity.
+
+Granular TPM Actions: Clearly separates your intervention into 1) Data-driven unit-economics modeling, 2) Phased technical compromise (non-prod vs. prod), and 3) Shared governance with automated safety guards.
+
+Concrete Metrics: Highlights specific financial ($52k savings, 40% overrun) and technical (sub-10ms latency, 99.99% SLA) metrics that demonstrate Senior TPM rigor.
 
 ### Q8. Tell me about a time you helped someone when it wasn't your responsibility to do so.
 
